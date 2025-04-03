@@ -1,7 +1,6 @@
 local highlight = require('lualine.highlight')
 
 local LspProgress = require('lualine.component'):extend()
-local utils = require('lualine.utils.utils')
 -- LuaFormatter off
 LspProgress.default = {
     colors = {
@@ -69,7 +68,7 @@ end
 
 LspProgress.update_status = function(self)
     self:update_progress()
-    return utils.stl_escape(self.progress_message)
+    return self.progress_message
 end
 
 LspProgress.register_progress = function(self)
@@ -78,6 +77,10 @@ LspProgress.register_progress = function(self)
     self.progress_callback = function(_, msg, info)
         local key = msg.token
         local val = msg.value
+
+        if val.message and string.find(val.message, '%%') then
+            val.message = val.message:gsub('%%', '%%%%')
+        end
 
         local client_key = tostring(info.client_id)
 
